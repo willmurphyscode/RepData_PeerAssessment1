@@ -7,12 +7,23 @@ output:
 
 
 ## Loading and preprocessing the data
-
-
+```{r}
+library(lubridate)
+dat <- read.table(unz("activity.zip", "activity.csv"), sep=",", header=TRUE, stringsAsFactors = FALSE)
+dat$date <- ymd(dat$date)
+head(dat)
+```
 
 ## What is mean total number of steps taken per day?
+```{r}
+totalPerDay <- tapply(dat$steps, factor(dat$date), sum, na.rm = TRUE)
+meanPerDay <- mean(totalPerDay)
+medianPerDay <- median(totalPerDay)
+hist(totalPerDay, main="Histogram for Total Steps Per Day", xlab="Number of Steps Taken", breaks = 10)
 
+```
 
+The mean total steps per day is `r meanPerDay` and the median total steps per day is `r medianPerDay`.
 
 ## What is the average daily activity pattern?
 
