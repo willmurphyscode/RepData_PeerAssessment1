@@ -27,20 +27,25 @@ The mean total steps per day is `r meanPerDay` and the median total steps per da
 
 ## What is the average daily activity pattern?
 ```{r} 
-totalsPerInterval <- tapply(dat$steps, factor(dat$interval), mean, na.rm=TRUE)
-plot(as.numeric(names(totalsPerInterval)), 
-     totalsPerInterval, 
+meansPerInterval <- tapply(dat$steps, factor(dat$interval), mean, na.rm=TRUE)
+plot(as.numeric(names(meansPerInterval)), 
+     meansPerInterval, 
      type="l",
      main = "Mean Steps by 5 Minute Interval",
      xlab = "Interval (i.e. minutes after midnight, in five-minute groups)",
      ylab = "Mean Steps During Interval")
-intervalWithMostSteps <- names(totalsPerInterval)[which.max(totalsPerInterval)]
+intervalWithMostSteps <- names(meansPerInterval)[which.max(meansPerInterval)]
 
 ```
 The interval with the highest mean number of steps is `r intervalWithMostSteps`
 
 ## Imputing missing values
+```{r} 
+anyValueIsNa <- is.na(dat$steps) | is.na(dat$date) | is.na(dat$interval)
+totalNas <- sum(anyValueIsNa)
 
-
+ 
+```
+The total number of rows with any missing value is `r totalNas`. 
 
 ## Are there differences in activity patterns between weekdays and weekends?
