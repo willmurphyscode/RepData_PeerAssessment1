@@ -26,8 +26,18 @@ hist(totalPerDay, main="Histogram for Total Steps Per Day", xlab="Number of Step
 The mean total steps per day is `r meanPerDay` and the median total steps per day is `r medianPerDay`.
 
 ## What is the average daily activity pattern?
+```{r} 
+totalsPerInterval <- tapply(dat$steps, factor(dat$interval), mean, na.rm=TRUE)
+plot(as.numeric(names(totalsPerInterval)), 
+     totalsPerInterval, 
+     type="l",
+     main = "Mean Steps by 5 Minute Interval",
+     xlab = "Interval (i.e. minutes after midnight, in five-minute groups)",
+     ylab = "Mean Steps During Interval")
+intervalWithMostSteps <- names(totalsPerInterval)[which.max(totalsPerInterval)]
 
-
+```
+The interval with the highest mean number of steps is `r intervalWithMostSteps`
 
 ## Imputing missing values
 
