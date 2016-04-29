@@ -43,8 +43,17 @@ The interval with the highest mean number of steps is `r intervalWithMostSteps`
 ```{r} 
 anyValueIsNa <- is.na(dat$steps) | is.na(dat$date) | is.na(dat$interval)
 totalNas <- sum(anyValueIsNa)
+dat$dayOfWeek <- wday(dat$date)
+meanIntervalByWeekday <- tapply(dat$steps, interaction(dat$interval, dat$dayOfWeek), mean, na.rm = TRUE)
+typicalDay <- data.frame(steps = meanIntervalByWeekday, intervalDay = names(meanIntervalByWeekday))
+typicalDay$interval <- as.integer(unlist(strsplit(as.character(typicalDay$intervalDay), ".", fixed=TRUE))[1])
+typicalDay$weekday <- as.integer(unlist(strsplit(as.character(typicalDay$intervalDay), ".", fixed=TRUE)[2]))
 
- 
+getExpectedValue <- function(dfRow) {
+   intervalDayInput <- paste(as.character(dfRow$interval), as.character(dfRow$dayOfWeeek), ".")
+   
+}
+
 ```
 The total number of rows with any missing value is `r totalNas`. 
 
