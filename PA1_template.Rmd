@@ -74,10 +74,13 @@ The total number of rows with any missing value is `r totalNas`.
 To impute missing values, I took the average value for that interval for that weekday. For example, if a 745 on a Monday was missing, the mean of all recorded steps for 745 on Monday was used. 
 
 ```{r} 
+par(mfrow=c(1,2))
 hist(withImputed$steps)
-stepsPerDayWithImputed <- tapply(withImputed$steps, withImputed$weekday, mean)
-meanWithImputed <- mean(withImputed$steps)
-medianWithImputed <- median(withImputed$steps)
+hist(dat$steps)
+stepsPerDayWithImputed <- tapply(withImputed$steps, withImputed$date, sum)
+meanWithImputed <- mean(stepsPerDayWithImputed)
+medianWithImputed <- median(stepsPerDayWithImputed)
 ```
+It seems that the method of imputing the data has very little effect on its distribution. The mean steps per day with imputed values was `r meanWithImputed`, and without imputed was `r meanPerDay`. The median with imputed values was `r medianWithImputed`, and before the imputed data were added, the median was `r medianPerDay`.
 
 ## Are there differences in activity patterns between weekdays and weekends?

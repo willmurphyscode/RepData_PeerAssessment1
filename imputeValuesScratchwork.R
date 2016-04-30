@@ -8,8 +8,10 @@ anyValueIsNa <- is.na(dat$steps) | is.na(dat$date) | is.na(dat$interval)
 totalNas <- sum(anyValueIsNa)
 dat$dayOfWeek <- wday(dat$date)
 meanIntervalByWeekday <- tapply(dat$steps, interaction(dat$interval, dat$dayOfWeek), mean, na.rm = TRUE)
+
 typicalDay <- data.frame(steps = meanIntervalByWeekday, intervalDay = names(meanIntervalByWeekday))
 typicalDay <- mutate(typicalDay, intervalDay = as.character(intervalDay))
+
 
 imputeValues <- function(df) {
   intervalDayInput <- paste(as.character(df$interval), as.character(df$dayOfWeek), sep =  ".")
