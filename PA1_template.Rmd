@@ -41,6 +41,7 @@ The interval with the highest mean number of steps is `r intervalWithMostSteps`
 
 ## Imputing missing values
 ```{r} 
+library(dplyr)
 anyValueIsNa <- is.na(dat$steps) | is.na(dat$date) | is.na(dat$interval)
 totalNas <- sum(anyValueIsNa)
 dat$dayOfWeek <- wday(dat$date)
@@ -49,12 +50,30 @@ typicalDay <- data.frame(steps = meanIntervalByWeekday, intervalDay = names(mean
 typicalDay$interval <- as.integer(unlist(strsplit(as.character(typicalDay$intervalDay), ".", fixed=TRUE))[1])
 typicalDay$weekday <- as.integer(unlist(strsplit(as.character(typicalDay$intervalDay), ".", fixed=TRUE)[2]))
 
-getExpectedValue <- function(dfRow) {
-   intervalDayInput <- paste(as.character(dfRow$interval), as.character(dfRow$dayOfWeeek), ".")
+imputeValues <- function(df) {
+   intervalDayInput <- paste(as.character(df$interval), as.character(df$dayOfWeeek), sep =  ".")
+   df$intervalDay = intervalDayInput
+   df <- df %>% left_join(typicalDay, c("intervalDay" = "intervalDay"))
+   df <- rename(df, steps = steps.x, interval = interval.x, imputedValue = steps.y)
    
+   ixesToUpdate <- which(is.na(df$steps))
+   
+   df$steps[ixesToUpdate] <- df$imputedValue[ixesToUpdate]
+   df
 }
+withImputed <- dat
+withImputed <- imputeValues(withImputed)
 
 ```
 The total number of rows with any missing value is `r totalNas`. 
+
+To impute missing values, I took the average value for that interval for that weekday. For example, if a 745 on a Monday was missing, the mean of all recorded steps for 745 on Monday was used. 
+
+```{r} 
+hist(withImputed$steps)
+stepsPerDayWithImputed <- tapply(withImputed$steps, withImputed$weekday, mean)
+meanWithImputed <- mean(withImputed$steps)
+medianWithImputed <- median(withImputed$steps)
+```
 
 ## Are there differences in activity patterns between weekdays and weekends?
