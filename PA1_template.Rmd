@@ -6,6 +6,7 @@ output:
 ---
 
 
+
 ## Loading and preprocessing the data
 ```{r}
 library(lubridate)
@@ -79,8 +80,15 @@ hist(withImputed$steps)
 hist(dat$steps)
 stepsPerDayWithImputed <- tapply(withImputed$steps, withImputed$date, sum)
 meanWithImputed <- mean(stepsPerDayWithImputed)
+meanWithImputed <- sprintf("%05.2f", meanWithImputed)
 medianWithImputed <- median(stepsPerDayWithImputed)
+medianWithImputed <- sprintf("%05.2f", medianWithImputed)
+printMedian <- sprintf("%05.2f", medianPerDay)
+printMean <- sprintf("%05.2f", meanPerDay)
+
 ```
-It seems that the method of imputing the data has very little effect on its distribution. The mean steps per day with imputed values was `r meanWithImputed`, and without imputed was `r meanPerDay`. The median with imputed values was `r medianWithImputed`, and before the imputed data were added, the median was `r medianPerDay`.
+It seems that the method of imputing the data has very little effect on its distribution. The mean steps per day with imputed values was `r meanWithImputed`, and without imputed was `r printMean`. The median with imputed values was `r medianWithImputed`, and before the imputed data were added, the median was `r printMedian`.
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+
