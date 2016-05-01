@@ -19,7 +19,7 @@ imputeValues <- function(df) {
   print(head(unique(df$intervalDay)))
   df <- df %>% left_join(typicalDay, c("intervalDay" = "intervalDay"))
   
-  df <- rename(df, steps = steps.x, imputedValue = steps.y)
+  df <- rename(df, steps = steps.x, imputedValue = steps.y, weekday = dayOfWeek)
   
   ixesToUpdate <- which(is.na(df$steps))
   
@@ -30,3 +30,4 @@ imputeValues <- function(df) {
 withImputed <- dat
 withImputed <- imputeValues(withImputed)
 
+print(unique(withImputed$weekday))
