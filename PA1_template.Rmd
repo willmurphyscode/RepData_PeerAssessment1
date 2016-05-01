@@ -58,7 +58,7 @@ imputeValues <- function(df) {
   print(head(unique(df$intervalDay)))
   df <- df %>% left_join(typicalDay, c("intervalDay" = "intervalDay"))
   
-  df <- rename(df, steps = steps.x, imputedValue = steps.y)
+  df <- rename(df, steps = steps.x, imputedValue = steps.y, weekday = dayOfWeek)
   
   ixesToUpdate <- which(is.na(df$steps))
   
@@ -90,5 +90,26 @@ printMean <- sprintf("%05.2f", meanPerDay)
 It seems that the method of imputing the data has very little effect on its distribution. The mean steps per day with imputed values was `r meanWithImputed`, and without imputed was `r printMean`. The median with imputed values was `r medianWithImputed`, and before the imputed data were added, the median was `r printMedian`.
 
 ## Are there differences in activity patterns between weekdays and weekends?
+```{r}
+sat <- 7; sun <- 1
+isWeekend <- withImputed$weekday == sat | withImputed$weekday == sun
+weekendIntervals <- subset(withImputed, isWeekend)
+weekdayIntervals <- subset(withImputed, !isWeekend)
+weekdayMeansPerInterval <- tapply(weekdayIntervals$steps, factor(weekdayIntervals$interval), mean)
+weekendMeansPerInterval <- tapply(weekendIntervals$steps, factor(weekendIntervals$interval), mean)
+plot(as.numeric(names(weekdayMeansPerInterval)), 
+     weekdayMeansPerInterval, 
+     type="l",
+     main = "Mean Steps by 5 Minute Interval, Weekdays",
+     xlab = "Interval (i.e. minutes after midnight, in five-minute groups)",
+     ylab = "Mean Steps During Interval")
 
+plot(as.numeric(names(weekendMeansPerInterval)), 
+     weekendMeansPerInterval, 
+     type="l",
+     main = "Mean Steps by 5 Minute Interval, Weekends",
+     xlab = "Interval (i.e. minutes after midnight, in five-minute groups)",
+     ylab = "Mean Steps During Interval")
+
+```
 
