@@ -93,6 +93,7 @@ It seems that the method of imputing the data has very little effect on its dist
 ```{r}
 sat <- 7; sun <- 1
 isWeekend <- withImputed$weekday == sat | withImputed$weekday == sun
+withImputed <- data.frame(withImputed, weekend = factor(isWeekend, labels=c("weekday", "weekend")))
 weekendIntervals <- subset(withImputed, isWeekend)
 weekdayIntervals <- subset(withImputed, !isWeekend)
 weekdayMeansPerInterval <- tapply(weekdayIntervals$steps, factor(weekdayIntervals$interval), mean)
