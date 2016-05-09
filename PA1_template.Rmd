@@ -8,7 +8,7 @@ output:
 
 
 ## Loading and preprocessing the data
-```{r}
+```{r message=FALSE}
 library(lubridate)
 dat <- read.table(unz("activity.zip", "activity.csv"), sep=",", header=TRUE, stringsAsFactors = FALSE)
 dat$date <- ymd(dat$date)
@@ -16,7 +16,7 @@ head(dat)
 ```
 
 ## What is mean total number of steps taken per day?
-```{r}
+```{r message=FALSE}
 totalPerDay <- tapply(dat$steps, factor(dat$date), sum, na.rm = TRUE)
 meanPerDay <- mean(totalPerDay)
 medianPerDay <- median(totalPerDay)
@@ -27,7 +27,7 @@ hist(totalPerDay, main="Histogram for Total Steps Per Day", xlab="Number of Step
 The mean total steps per day is `r meanPerDay` and the median total steps per day is `r medianPerDay`.
 
 ## What is the average daily activity pattern?
-```{r} 
+```{r message=FALSE} 
 meansPerInterval <- tapply(dat$steps, factor(dat$interval), mean, na.rm=TRUE)
 plot(as.numeric(names(meansPerInterval)), 
      meansPerInterval, 
@@ -41,7 +41,7 @@ intervalWithMostSteps <- names(meansPerInterval)[which.max(meansPerInterval)]
 The interval with the highest mean number of steps is `r intervalWithMostSteps`
 
 ## Imputing missing values
-```{r} 
+```{r message=FALSE} 
 library(dplyr)
 anyValueIsNa <- is.na(dat$steps) | is.na(dat$date) | is.na(dat$interval)
 totalNas <- sum(anyValueIsNa)
@@ -55,7 +55,7 @@ typicalDay <- mutate(typicalDay, intervalDay = as.character(intervalDay))
 imputeValues <- function(df) {
   intervalDayInput <- paste(as.character(df$interval), as.character(df$dayOfWeek), sep =  ".")
   df$intervalDay = intervalDayInput
-  print(head(unique(df$intervalDay)))
+
   df <- df %>% left_join(typicalDay, c("intervalDay" = "intervalDay"))
   
   df <- rename(df, steps = steps.x, imputedValue = steps.y, weekday = dayOfWeek)
@@ -63,7 +63,7 @@ imputeValues <- function(df) {
   ixesToUpdate <- which(is.na(df$steps))
   
   df$steps[ixesToUpdate] <- df$imputedValue[ixesToUpdate]
-  print(head(df))
+  
   df
 }
 withImputed <- dat
@@ -74,10 +74,10 @@ The total number of rows with any missing value is `r totalNas`.
 
 To impute missing values, I took the average value for that interval for that weekday. For example, if a 745 on a Monday was missing, the mean of all recorded steps for 745 on Monday was used. 
 
-```{r} 
+```{r message=FALSE} 
 par(mfrow=c(1,2))
-hist(withImputed$steps)
-hist(dat$steps)
+hist(withImputed$steps, main = "With Imputed Values", xlab = "Interval")
+hist(dat$steps, main = "Without Imputed Values", xlab = "Interval")
 stepsPerDayWithImputed <- tapply(withImputed$steps, withImputed$date, sum)
 meanWithImputed <- mean(stepsPerDayWithImputed)
 meanWithImputed <- sprintf("%05.2f", meanWithImputed)
@@ -90,7 +90,10 @@ printMean <- sprintf("%05.2f", meanPerDay)
 It seems that the method of imputing the data has very little effect on its distribution. The mean steps per day with imputed values was `r meanWithImputed`, and without imputed was `r printMean`. The median with imputed values was `r medianWithImputed`, and before the imputed data were added, the median was `r printMedian`.
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r}
+```{r message=FALSE}
+library(ggplot2)
+library(grid)
+library(lattice)
 sat <- 7; sun <- 1
 isWeekend <- withImputed$weekday == sat | withImputed$weekday == sun
 withImputed <- data.frame(withImputed, weekend = factor(isWeekend, labels=c("weekday", "weekend")))
@@ -98,6 +101,7 @@ weekendIntervals <- subset(withImputed, isWeekend)
 weekdayIntervals <- subset(withImputed, !isWeekend)
 weekdayMeansPerInterval <- tapply(weekdayIntervals$steps, factor(weekdayIntervals$interval), mean)
 weekendMeansPerInterval <- tapply(weekendIntervals$steps, factor(weekendIntervals$interval), mean)
+par(mfrow=c(2,1))
 plot(as.numeric(names(weekdayMeansPerInterval)), 
      weekdayMeansPerInterval, 
      type="l",
